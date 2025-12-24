@@ -1060,6 +1060,17 @@ const messages = {
           cancel: "Cancelar",
         },
       },
+      solutionDescriptionModal: {
+        title: "Descrição da Solução do Problema",
+        form: {
+          description: "Descrição da Solução",
+          placeholder: "Descreva a solução aplicada para resolver o problema...",
+        },
+        buttons: {
+          cancel: "Cancelar",
+          confirm: "Finalizar Atendimento",
+        },
+      },
       messageOptionsMenu: {
         delete: "Deletar",
         edit: "Editar",

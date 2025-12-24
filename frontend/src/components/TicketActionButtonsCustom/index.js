@@ -18,9 +18,14 @@ import AddBoxIcon from '@material-ui/icons/AddBox';
 import { Call, CallEnd } from "@material-ui/icons";
 import Tooltip from '@material-ui/core/Tooltip';
 import { green } from '@material-ui/core/colors';
+<<<<<<< Updated upstream
 import { PhoneCallContext } from "../../context/PhoneCall/PhoneCallContext";
 import { wavoipAvailable, wavoipCall } from "../../helpers/wavoipCallManager";
-import { toBeChecked } from "@testing-library/jest-dom/matchers";
+import SolutionDescriptionModal from "../SolutionDescriptionModal";
+=======
+import SolutionDescriptionModal from "../SolutionDescriptionModal";
+
+>>>>>>> Stashed changes
 
 const useStyles = makeStyles(theme => ({
 	actionButtons: {
@@ -39,6 +44,7 @@ const TicketActionButtonsCustom = ({ ticket, showTabGroups }) => {
 	const history = useHistory();
 	const [anchorEl, setAnchorEl] = useState(null);
 	const [loading, setLoading] = useState(false);
+	const [solutionModalOpen, setSolutionModalOpen] = useState(false);
 	const ticketOptionsMenuOpen = Boolean(anchorEl);
 	const { user } = useContext(AuthContext);
 	const { setCurrentTicket } = useContext(TicketsContext);
@@ -58,13 +64,19 @@ const TicketActionButtonsCustom = ({ ticket, showTabGroups }) => {
 		setAnchorEl(null);
 	};
 
-	const handleUpdateTicketStatus = async (e, status, userId) => {
+	const handleUpdateTicketStatus = async (e, status, userId, solutionDescription = null) => {
 		setLoading(true);
 		try {
-			await api.put(`/tickets/${ticket.id}`, {
+			const data = {
 				status: status,
 				userId: userId || null,
-			});
+			};
+
+			if (solutionDescription) {
+				data.solutionDescription = solutionDescription;
+			}
+
+			await api.put(`/tickets/${ticket.id}`, data);
 
 			setLoading(false);
 			if (status === "open") {
@@ -97,7 +109,41 @@ const TicketActionButtonsCustom = ({ ticket, showTabGroups }) => {
         toastError(err);
       });
   };
-     
+
+	const handleCloseSolutionModal = () => {
+		setSolutionModalOpen(false);
+	};
+
+	const handleConfirmSolution = (solutionDescription) => {
+		setSolutionModalOpen(false);
+		handleUpdateTicketStatus(null, "closed", user?.id, solutionDescription);
+	};
+
+	const handleResolveTicket = (e) => {
+		// Remove focus from the button to prevent accessibility issues
+		if (e && e.target) {
+			e.target.blur();
+		}
+		setSolutionModalOpen(true);
+	};
+
+	const handleCloseSolutionModal = () => {
+		setSolutionModalOpen(false);
+	};
+
+	const handleConfirmSolution = (solutionDescription) => {
+		setSolutionModalOpen(false);
+		handleUpdateTicketStatus(null, "closed", user?.id, solutionDescription);
+	};
+
+	const handleResolveTicket = (e) => {
+		// Remove focus from the button to prevent accessibility issues
+		if (e && e.target) {
+			e.target.blur();
+		}
+		setSolutionModalOpen(true);
+	};
+
 	return (
     <div className={classes.actionButtons}>
       {ticket.status === "closed" && (!showTabGroups || !ticket.isGroup) && (
@@ -161,7 +207,7 @@ const TicketActionButtonsCustom = ({ ticket, showTabGroups }) => {
               </Tooltip>
               <ThemeProvider theme={customTheme}>
                 <Tooltip title={i18n.t("messagesList.header.buttons.resolve")}>
-                  <IconButton onClick={e => handleUpdateTicketStatus(e, "closed", user?.id)} color="primary">
+                  <IconButton onClick={handleResolveTicket} color="primary">
                     <CheckCircleIcon />
                   </IconButton>
                 </Tooltip>
@@ -192,6 +238,11 @@ const TicketActionButtonsCustom = ({ ticket, showTabGroups }) => {
 					{i18n.t("messagesList.header.buttons.accept")}
 				</ButtonWithSpinner>
 			)}
+			<SolutionDescriptionModal
+				open={solutionModalOpen}
+				onClose={handleCloseSolutionModal}
+				onConfirm={handleConfirmSolution}
+			/>
 		</div>
 	);
 };

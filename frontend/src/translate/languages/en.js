@@ -1053,6 +1053,17 @@ const messages = {
           cancel: "Cancel",
         },
       },
+      solutionDescriptionModal: {
+        title: "Problem Solution Description",
+        form: {
+          description: "Solution Description",
+          placeholder: "Describe the solution applied to resolve the problem...",
+        },
+        buttons: {
+          cancel: "Cancel",
+          confirm: "Resolve Ticket",
+        },
+      },
       messageOptionsMenu: {
         delete: "Delete",
         edit: "Edit",

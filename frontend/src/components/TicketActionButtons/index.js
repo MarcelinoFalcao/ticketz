@@ -11,6 +11,7 @@ import TicketOptionsMenu from "../TicketOptionsMenu";
 import ButtonWithSpinner from "../ButtonWithSpinner";
 import toastError from "../../errors/toastError";
 import { AuthContext } from "../../context/Auth/AuthContext";
+import SolutionDescriptionModal from "../SolutionDescriptionModal";
 
 const useStyles = makeStyles(theme => ({
 	actionButtons: {
@@ -30,6 +31,7 @@ const TicketActionButtons = ({ ticket }) => {
 	const history = useHistory();
 	const [anchorEl, setAnchorEl] = useState(null);
 	const [loading, setLoading] = useState(false);
+	const [solutionModalOpen, setSolutionModalOpen] = useState(false);
 	const ticketOptionsMenuOpen = Boolean(anchorEl);
 	const { user } = useContext(AuthContext);
 
@@ -41,13 +43,19 @@ const TicketActionButtons = ({ ticket }) => {
 		setAnchorEl(null);
 	};
 
-	const handleUpdateTicketStatus = async (e, status, userId) => {
+	const handleUpdateTicketStatus = async (e, status, userId, solutionDescription = null) => {
 		setLoading(true);
 		try {
-			await api.put(`/tickets/${ticket.id}`, {
+			const data = {
 				status: status,
 				userId: userId || null,
-			});
+			};
+
+			if (solutionDescription) {
+				data.solutionDescription = solutionDescription;
+			}
+
+			await api.put(`/tickets/${ticket.id}`, data);
 
 			setLoading(false);
 			if (status === "open") {
@@ -59,6 +67,23 @@ const TicketActionButtons = ({ ticket }) => {
 			setLoading(false);
 			toastError(err);
 		}
+	};
+
+	const handleCloseSolutionModal = () => {
+		setSolutionModalOpen(false);
+	};
+
+	const handleConfirmSolution = (solutionDescription) => {
+		setSolutionModalOpen(false);
+		handleUpdateTicketStatus(null, "closed", user?.id, solutionDescription);
+	};
+
+	const handleResolveTicket = (e) => {
+		// Remove focus from the button to prevent accessibility issues
+		if (e && e.target) {
+			e.target.blur();
+		}
+		setSolutionModalOpen(true);
 	};
 
 	return (
@@ -88,7 +113,7 @@ const TicketActionButtons = ({ ticket }) => {
 						size="small"
 						variant="contained"
 						color="primary"
-						onClick={e => handleUpdateTicketStatus(e, "closed", user?.id)}
+						onClick={handleResolveTicket}
 					>
 						{i18n.t("messagesList.header.buttons.resolve")}
 					</ButtonWithSpinner>
@@ -114,6 +139,11 @@ const TicketActionButtons = ({ ticket }) => {
 					{i18n.t("messagesList.header.buttons.accept")}
 				</ButtonWithSpinner>
 			)}
+			<SolutionDescriptionModal
+				open={solutionModalOpen}
+				onClose={handleCloseSolutionModal}
+				onConfirm={handleConfirmSolution}
+			/>
 		</div>
 	);
 };

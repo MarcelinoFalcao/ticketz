@@ -34,15 +34,22 @@ const useStyles = makeStyles(theme => ({
     }
 }));
 
+// Utility function to safely format numbers
+const safeToFixed = (value, decimals = 1) => {
+    const num = parseFloat(value);
+    return !isNaN(num) && isFinite(num) ? num.toFixed(decimals) : '0.0';
+};
+
 export function RatingBox ({ rating }) {
-    const ratingTrunc = rating === null ? 0 : Math.trunc(rating);
+    const ratingTrunc = (rating && !isNaN(rating)) ? Math.trunc(rating) : 0;
+    const ratingValue = (rating && !isNaN(rating)) ? rating : 0;
     return <div style={{ width: "max-content" }}>
       <Rating
         defaultValue={ratingTrunc}
         max={5}
         readOnly
       />
-      <span style={{ verticalAlign: "super"}}>&nbsp;({ratingTrunc?.toFixed(1)})</span>
+      <span style={{ verticalAlign: "super"}}>&nbsp;({safeToFixed(ratingValue)})</span>
     </div>
 }
 

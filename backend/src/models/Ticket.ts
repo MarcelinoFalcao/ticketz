@@ -115,6 +115,9 @@ class Ticket extends Model<Ticket> {
   @Column
   uuid: string;
 
+  @Column({ allowNull: true })
+  solutionDescription: string;
+
   @BeforeCreate
   static setUUID(ticket: Ticket) {
     ticket.uuid = uuidv4();

@@ -21,26 +21,35 @@ import { grey, blue } from "@material-ui/core/colors";
 import { toast } from "react-toastify";
 
 import TableAttendantsStatus from "../../components/Dashboard/TableAttendantsStatus";
+import TopPerformers from "../../components/Dashboard/TopPerformers";
+import PerformanceMetrics from "../../components/Dashboard/PerformanceMetrics";
+import WorkloadDistribution from "../../components/Dashboard/WorkloadDistribution";
 
 import { isEmpty } from "lodash";
 import moment from "moment";
 import { i18n } from "../../translate/i18n";
-import OnlyForSuperUser from "../../components/OnlyForSuperUser";
 import useAuth from "../../hooks/useAuth.js";
-import clsx from "clsx";
-import { loadJSON } from "../../helpers/loadJSON";
 
 import { SmallPie } from "./SmallPie";
 import { TicketCountersChart } from "./TicketCountersChart";
 import { getTimezoneOffset } from "../../helpers/getTimezoneOffset.js";
-
+<<<<<<< Updated upstream
 import TicketzRegistry from "../../components/TicketzRegistry";
 import { copyToClipboard } from "../../helpers/copyToClipboard.js";
+import OnlyForSuperUser from "../../components/OnlyForSuperUser";
+import clsx from "clsx";
+import { loadJSON } from "../../helpers/loadJSON";
 import api from "../../services/api.js";
 import { SocketContext } from "../../context/Socket/SocketContext.js";
 import { formatTimeInterval } from "../../helpers/formatTimeInterval.js";
+=======
 
-const gitinfo = loadJSON('/gitinfo.json');
+
+import api from "../../services/api.js";
+import { SocketContext } from "../../context/Socket/SocketContext.js";
+
+
+>>>>>>> Stashed changes
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -271,11 +280,15 @@ const Dashboard = () => {
   );
   const [dateTo, setDateTo] = useState(moment().format("YYYY-MM-DDTHH") + ":59");
   const { getCurrentUserInfo } = useAuth();
-    
+<<<<<<< Updated upstream
   const [supportPix, setSupportPix] = useState(false);
   const [supportIsBr, setSupportIsBr] = useState(false);
   const [registered, setRegistered] = useState(false);
   const [proInstructionsOpen, setProInstructionsOpen] = useState(false);
+=======
+    
+
+>>>>>>> Stashed changes
   
   const [usersOnlineTotal, setUsersOnlineTotal] = useState(0);
   const [usersOfflineTotal, setUsersOfflineTotal] = useState(0);
@@ -291,15 +304,7 @@ const Dashboard = () => {
 
   const socketManager = useContext(SocketContext);
     
-  async function showProInstructions() {
-    if (gitinfo.commitHash) {
-      setProInstructionsOpen(true);
-      return;
-    }
-    
-    window.open("https://pro.ticke.tz", "_blank");
-  }
-  
+<<<<<<< Updated upstream
   useEffect(() => {
     fetch('https://ipapi.co/json/')
       .then(res => res.json())
@@ -310,6 +315,9 @@ const Dashboard = () => {
         }
       });
   }, []);
+=======
+
+>>>>>>> Stashed changes
   
   useEffect(() => {
     const socket = socketManager.GetSocket(companyId);
@@ -334,11 +342,7 @@ const Dashboard = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  useEffect(async () => {
-    const registry = await api.get("/ticketz/registry");
 
-    setRegistered( registry?.data?.disabled || !!(registry?.data?.whatsapp ) );
-  }, []);
     
   useEffect(() => {
     fetchData();
@@ -467,6 +471,11 @@ const Dashboard = () => {
   }, [])
 
   const companyId = localStorage.getItem("companyId");
+  const gitinfo = loadJSON('/gitinfo.json');
+
+  function showProInstructions() {
+    setProInstructionsOpen(!proInstructionsOpen);
+  }
 
   function renderFilters() {
       return (
@@ -536,6 +545,7 @@ const Dashboard = () => {
       <Container maxWidth="lg" className={classes.container}>
         <Grid container spacing={3} justifyContent="flex-start">
 
+<<<<<<< Updated upstream
           { !localStorage.getItem("hideAds") && <OnlyForSuperUser
             user={currentUser}
             yes={() => (
@@ -682,6 +692,9 @@ const Dashboard = () => {
                 </Paper>
               </Grid>
             )} /> }
+=======
+
+>>>>>>> Stashed changes
 
           {/* USUARIOS ONLINE */}
           <InfoRingCard
@@ -755,14 +768,47 @@ const Dashboard = () => {
           </Grid>
 
 
-          {/* USER REPORT */}
-          <Grid item xs={12}>
-            {usersData.userReport?.length ? (
-              <TableAttendantsStatus
+          {/* MÉTRICAS DE PERFORMANCE DA EQUIPE */}
+          {usersData.userReport?.length > 0 && (
+            <Grid item xs={12}>
+              <PerformanceMetrics 
                 attendants={usersData.userReport}
-                loading={loadingUsers}
+                ticketsData={ticketsData}
               />
-            ) : null}
+            </Grid>
+          )}
+
+          {/* TOP PERFORMERS & ANÁLISE DE EQUIPE */}
+          {usersData.userReport?.length > 0 && (
+            <Grid item xs={12}>
+              <TopPerformers attendants={usersData.userReport} />
+            </Grid>
+          )}
+
+          {/* DISTRIBUIÇÃO DE CARGA DE TRABALHO */}
+          {usersData.userReport?.length > 0 && (
+            <Grid item xs={12}>
+              <WorkloadDistribution attendants={usersData.userReport} />
+            </Grid>
+          )}
+
+          {/* PRODUTIVIDADE POR TÉCNICO - TABELA DETALHADA */}
+          <Grid item xs={12}>
+            <Paper className={classes.fixedHeightPaper}>
+              <Typography component="h2" variant="h6" color="primary" gutterBottom style={{ padding: "16px 16px 0 16px" }}>
+                📋 Relatório Detalhado de Produtividade
+              </Typography>
+              {usersData.userReport?.length ? (
+                <TableAttendantsStatus
+                  attendants={usersData.userReport}
+                  loading={loadingUsers}
+                />
+              ) : (
+                <Typography style={{ padding: "16px" }}>
+                  Nenhum dado de produtividade disponível para o período selecionado.
+                </Typography>
+              )}
+            </Paper>
           </Grid>
 
         </Grid>
