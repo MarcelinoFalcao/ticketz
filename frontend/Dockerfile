@@ -6,7 +6,7 @@ COPY . .
 ENV NODE_OPTIONS --openssl-legacy-provider
 
 RUN npm install --legacy-peer-deps
-RUN npm run build
+RUN CI=false npm run build
 
 FROM ghcr.io/ticketz-oss/nginx-alpine
 
