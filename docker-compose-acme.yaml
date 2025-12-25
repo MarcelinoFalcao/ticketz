@@ -22,8 +22,12 @@ services:
       context: ./frontend
       dockerfile: Dockerfile
       args:
-        REACT_APP_BACKEND_URL: https://api.multiatendentes.com.br
-        BACKEND_URL: https://api.multiatendentes.com.br
+        REACT_APP_BACKEND_URL: 'https://api.multiatendentes.com.br'
+        BACKEND_URL: 'https://api.multiatendentes.com.br'
+        # As linhas abaixo sao a solucao magica:
+        CI: 'false'
+        NODE_ENV: 'development'
+        GENERATE_SOURCEMAP: 'false'
     restart: always
     volumes:
       - backend_public:/var/www/backend-public/
