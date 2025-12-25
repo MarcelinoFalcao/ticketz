@@ -7,6 +7,9 @@ services:
     restart: always
     environment:
       - NODE_ENV=production
+      - IO_REDIS_SERVER=redis
+      - IO_REDIS_PORT=6379
+      - DB_HOST=postgres
     volumes:
       - 'backend_public:/usr/src/app/public'
       - 'backend_private:/usr/src/app/private'
